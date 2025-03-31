@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./styles.css"; // Importa o CSS
+import "./styles.css";
 
 const UploadComponent = () => {
   const [file, setFile] = useState(null);
@@ -7,23 +7,23 @@ const UploadComponent = () => {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [items, setItems] = useState([]);
+  const [search, setSearch] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
 
   const fetchItems = async () => {
     try {
       const response = await fetch(`${API_URL}/api/v1/items`);
       const data = await response.json();
-      console.log("Dados recebidos:", data);
       setItems(Array.isArray(data.itens) ? data.itens : []);
     } catch (error) {
       console.error("Erro ao buscar itens:", error);
     }
   };
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -59,6 +59,12 @@ const UploadComponent = () => {
     }
   };
 
+  const filteredItems = search
+    ? items.filter((item) =>
+        item.title.toLowerCase().includes(search.toLowerCase())
+      )
+    : items;
+
   return (
     <div className="container">
       <h2>Upload de Arquivo</h2>
@@ -83,10 +89,18 @@ const UploadComponent = () => {
         </div>
       )}
 
+      <h2>Buscar Itens</h2>
+      <input
+        type="text"
+        placeholder="Pesquisar..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <h2>Itens Cadastrados</h2>
       <ul className="items-list">
-        {items.length > 0 ? (
-          items.map((item) => (
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
             <li key={item.id} className="item">
               <img src={`${API_URL}${item.image_url}`} alt={item.title} />
               <h3>{item.title}</h3>
