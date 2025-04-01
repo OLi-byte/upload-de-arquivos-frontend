@@ -48,7 +48,7 @@ const UploadComponent = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setImageUrl(`${API_URL}${data.item.image_url}`);
+        setImageUrl(`${data.item.image_url}`);
         fetchItems();
       } else {
         alert(data.message);
@@ -102,7 +102,7 @@ const UploadComponent = () => {
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
             <li key={item.id} className="item">
-              <img src={`${API_URL}${item.image_url}`} alt={item.title} />
+              <img src={`${item.image_url}`} alt={item.title} />
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </li>
