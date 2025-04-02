@@ -8,6 +8,8 @@ const UploadComponent = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [addingItem, SetaddingItem] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -57,6 +59,11 @@ const UploadComponent = () => {
       console.error("Erro no upload:", error);
       alert("Erro ao enviar o arquivo");
     }
+
+    setTitle("");
+    setDescription("");
+    setFile(null);
+    SetaddingItem(false);
   };
 
   const filteredItems = search
@@ -67,42 +74,34 @@ const UploadComponent = () => {
 
   return (
     <div className="container">
-      <h2>Upload de Arquivo</h2>
-      <input
-        type="text"
-        placeholder="Título"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        placeholder="Descrição"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Enviar</button>
+      <header className="header">
+        <button onClick={() => SetaddingItem(true)}>
+          + Adicionar novo item
+        </button>
+        <input
+          type="text"
+          placeholder="Pesquisar..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </header>
 
-      {imageUrl && (
+      {/* {imageUrl && (
         <div className="image-preview">
           <p>Arquivo enviado com sucesso!</p>
           <img src={imageUrl} alt="Imagem enviada" />
         </div>
-      )}
+      )} */}
 
-      <h2>Buscar Itens</h2>
-      <input
-        type="text"
-        placeholder="Pesquisar..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <h2>Itens Cadastrados</h2>
       <ul className="items-list">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => (
-            <li key={item.id} className="item">
-              <img src={`${item.image_url}`} alt={item.title} />
+            <li
+              key={item.id}
+              className="item"
+              onClick={() => setSelectedItem(item)}
+            >
+              <img src={item.image_url} alt={item.title} />
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </li>
@@ -111,6 +110,42 @@ const UploadComponent = () => {
           <p>Nenhum item encontrado.</p>
         )}
       </ul>
+
+      {selectedItem && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => setSelectedItem(null)}>
+              x
+            </span>
+            <h2>{selectedItem.title}</h2>
+            <img src={selectedItem.image_url} alt={selectedItem.title} />
+            <p>{selectedItem.description}</p>
+          </div>
+        </div>
+      )}
+
+      {addingItem && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={() => SetaddingItem(false)}>
+              x
+            </span>
+            <input
+              type="text"
+              placeholder="Título"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload}>Enviar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
